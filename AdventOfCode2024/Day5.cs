@@ -4,39 +4,52 @@
     {
         public static void Run()
         {
+            Console.WriteLine("######################################################");
             Console.WriteLine("Day 5");
-            var input = GetInput(@"D:\day5.txt");
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string relativePath = Path.Combine(basePath, "Input", "Day5.txt");
+            var input = GetInput(relativePath);
+            Console.WriteLine("-------------------------");
             Part1(input);
+            Console.WriteLine("-------------------------");
+            Part2(input);
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("######################################################");
         }
-
         public static void Part1(Tuple<int[][], int[][]> input)
         {
+            Console.WriteLine("Part 1");
+            int count = 0;
+            foreach (var item in input.Item2)
+            {
+                if (!IsUpdateValid(input.Item1, item))
+                {
+                    count += item[(item.Length - 1) / 2];
+                }
+            }
+            Console.WriteLine("Sum of Middle Number of Sorted Updates:" + count);
+        }
+        public static void Part2(Tuple<int[][], int[][]> input)
+        {
+            Console.WriteLine("Part 2");
+         
             int count = 0;
             foreach (var item in input.Item2)
             {
                 if (!IsUpdateValid(input.Item1, item))
                 {
                     int[] sorted = SortUpdate(item, input.Item1);
-                    Console.WriteLine("Sorted Update: ");
-                    foreach (var i in sorted)
-                    {
-                        Console.Write(i + " ");
-                    }
-                    Console.WriteLine("The Thing is now Sorted: " + IsUpdateValid(input.Item1, sorted));
-                    Console.WriteLine("Unsorted Update: ");
-                    foreach (var i in item)
-                    {
-                        Console.Write(i + " ");
-                    }
+                  
+                  
                     count += sorted[(item.Length - 1) / 2];
                 }
                 else
                 {
-                    Console.WriteLine("Invalid");
+                
                 }
-                Console.WriteLine();
+               
             }
-            Console.WriteLine(count);
+            Console.WriteLine("Sum of Middle Number of non Valid now Sorted Updates: "+count);
         }
 
         public static int[] SortUpdate(int[] update, int[][] rules)

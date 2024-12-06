@@ -15,12 +15,35 @@ namespace AdventOfCode2024
     {
         public static void Run()
         {
-            string[] locationNumbers = ReadLinesOfDocument(@"D:\loc.txt");
-            List<Value> values = GetValues(locationNumbers);
-            int totalDistance = CalculateSimilarityScore(values);
-            Console.WriteLine(totalDistance);
-        }
+            Console.WriteLine("######################################################");
+            Console.WriteLine("Day 1");
+            Console.WriteLine("-------------------------");
 
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string relativePath = Path.Combine(basePath, "Input", "Day1.txt");
+            string[] locationNumbers = ReadLinesOfDocument(relativePath);
+            List<Value> values = GetValues(locationNumbers);
+            Part1(values);
+            Console.WriteLine("-------------------------");
+            Part2(values);
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("######################################################");
+        }
+        public static void Part1(List<Value> values)
+        {
+            Console.WriteLine("Part 1");
+            //Calculate the total distance
+            int totalDistance = CalculateTotalDistance(values);
+            Console.WriteLine("The total distance is: " + totalDistance);
+
+            
+        }
+        public static void Part2(List<Value> values)
+        {
+            Console.WriteLine("Part 2");
+            int simularityScore = CalculateSimilarityScore(values);
+            Console.WriteLine("The similarity score is: " + simularityScore);
+        }
         public static int CalculateTotalDistance(List<Value> values)
         {
             var leftValues = values.Select(v => v.leftValue).OrderBy(v => v).ToList();

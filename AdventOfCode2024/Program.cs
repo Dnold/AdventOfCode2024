@@ -5,7 +5,7 @@
 
         public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Day6.Run();
         }
     }
 }

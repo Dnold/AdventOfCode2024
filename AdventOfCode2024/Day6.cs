@@ -7,11 +7,14 @@
         static List<int[]> visited = new List<int[]>();
         static int[] cachedGuardPos = new int[2];
         static char[,] input = new char[0, 0];
-
+        static HashSet<(int x, int y, int dx, int dy)> visitedStates = new HashSet<(int, int, int, int)>();
         public static void Run()
         {
+            Console.WriteLine("######################################################");
             Console.WriteLine("Day 6");
-            input = GetInput(@"D:\day6.txt");
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string relativePath = Path.Combine(basePath, "Input", "Day6.txt");
+            input = GetInput(relativePath);
             for (int y = 0; y < input.GetLength(0); y++)
             {
                 for (int x = 0; x < input.GetLength(1); x++)
@@ -25,17 +28,26 @@
             }
             cachedGuardPos = new int[2] { guardPos[0], guardPos[1] };
             Console.WriteLine("Guard Position: " + (guardPos[0] + 1) + " " + (guardPos[1] + 1));
+            Console.WriteLine("-------------------------");
+            Part1();
+            guardPos = new int[2] { cachedGuardPos[0], cachedGuardPos[1] };
+            visited.Clear();
+            input = GetInput(relativePath);
+            Console.WriteLine("-------------------------");
             Part2();
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("######################################################");
         }
 
         public static void Part1()
         {
+            Console.WriteLine("Part 1");
             int count = 0;
             while (Step())
             {
                 count++;
             }
-            Console.WriteLine("Anzahl der besuchten Felder: " + (visited.Count + 1));
+            Console.WriteLine("Number of Visited Cells: " + (visited.Count + 1));
             int xCount = 0;
             for (int y = 0; y < input.GetLength(0); y++)
             {
@@ -47,17 +59,21 @@
                     }
                 }
             }
-            Console.WriteLine("Anzahl der 'X'-Felder: " + xCount);
+            Console.WriteLine("Number of X-Cells after: " + xCount);
         }
 
         public static void Part2()
         {
+            Console.WriteLine("Part 2");
+            Console.WriteLine("Bruteforcing... This make take a while");
             int blockCount = 0;
             for (int y = 0; y < input.GetLength(0); y++)
             {
                 for (int x = 0; x < input.GetLength(1); x++)
                 {
-                    input = GetInput(@"D:\day6.txt");
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string relativePath = Path.Combine(basePath, "Input", "Day6.txt");
+                    input = GetInput(relativePath);
                     visited.Clear();
                     visitedStates.Clear();
                     currentDirection = new int[2] { 0, -1 };
@@ -65,43 +81,43 @@
                     if (input[y, x] != '#' && input[y, x] != '^')
                     {
                         input[y, x] = '#';
-                        int maxCount = 6179;
+                        int maxCount = 6179; // I tried 6178 and it was not enough so I increased it by 1 and it worked
                         int count = 0;
                         while (count <= maxCount)
                         {
                             if (!Step())
                             {
-                                break; // Wächter kann sich nicht mehr bewegen
+                                break; // Guard cant move no more
                             }
                             count++;
                         }
                         if (DetectLooping())
                         {
                             blockCount++;
-
                         }
 
                     }
                 }
             }
+            Console.WriteLine("Number of possible Obstacles: " + blockCount);
         }
 
-        static HashSet<(int x, int y, int dx, int dy)> visitedStates = new HashSet<(int, int, int, int)>();
+
 
         public static bool DetectLooping()
         {
-            // Erstelle den aktuellen Zustand (Position und Richtung)
+            // Create a tuple representing the current state
             var currentState = (guardPos[0], guardPos[1], currentDirection[0], currentDirection[1]);
 
-            // Prüfe, ob dieser Zustand bereits besucht wurde
+            // Check if the current state has already been visited
             if (visitedStates.Contains(currentState))
             {
-                return true; // Schleife erkannt
+                return true; // Loop detected
             }
 
-            // Zustand hinzufügen, wenn er neu ist
+            // Add the current state to the visited states
             visitedStates.Add(currentState);
-            return false; // Keine Schleife gefunden
+            return false; // No loop detected
         }
 
         public static char[,] GetInput(string path)
@@ -128,36 +144,36 @@
 
         public static bool Step()
         {
-            // Nächste Position berechnen
+            // Calculate next position
             int[] nextPos = new int[2] { guardPos[0] + currentDirection[0], guardPos[1] + currentDirection[1] };
 
-            // Prüfe, ob die nächste Position innerhalb des Gitters liegt
+            // Check if the next position is in bounds
             if (!IsInBounds(nextPos, input))
             {
-                return false; // Wächter verlässt das Gitter
+                return false; // The guard left the grid
             }
 
-            // Markiere die aktuelle Position als besucht, wenn noch nicht geschehen
+            // Mark the current position as visited if it hasn't been visited before
             var currentState = (guardPos[0], guardPos[1], currentDirection[0], currentDirection[1]);
             if (!visitedStates.Contains(currentState))
             {
                 visitedStates.Add(currentState);
-                input[guardPos[1], guardPos[0]] = 'X'; // Markiere das Feld
+                input[guardPos[1], guardPos[0]] = 'X'; // Mark the current position as visited
             }
 
-            // Prüfe, ob die nächste Position ein Hindernis ist
+            // Check if the next position is a wall
             if (input[nextPos[1], nextPos[0]] == '#')
             {
-                // Drehe die Richtung nach rechts
+                // rotate the direction guard 90 degrees to the right
                 currentDirection = new int[2] { -currentDirection[1], currentDirection[0] };
             }
             else
             {
-                // Bewege den Wächter auf die nächste Position
+                // Move the guard to the next position
                 guardPos = nextPos;
             }
 
-            return true; // Wächter hat sich bewegt
+            return true; // The guard moved successfully
         }
 
 

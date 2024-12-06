@@ -1,20 +1,67 @@
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 namespace AdventOfCode2024
 {
     public static class Day4
     {
+        public static int[][] directions = new int[][] {
+            new int []{ 0, 1  }, //Up
+           new int[] { 1, 0  }, //Right
+           new int[] { 1, 1  }, //Right UP
+           new int[] { 1, -1 }, //Right Down
+           new int[] { -1, 0 }, //Left
+           new int[] { -1, 1 }, //Left Up
+           new int[] { -1, -1}, //Left Down
+           new int[] { 0, -1 }  //Down
+        };
 
         public static void Run()
         {
-            int count = 0;
+            Console.WriteLine("######################################################");
+            Console.WriteLine("Day 4");
             char?[,] mask =
             {
-            {'M',null,'S' },
-            {null,'A',null },
-            {'M',null,'S' }
-        };
-            char[,] input = GetInputFromDocument(@"D:\grid.txt");
+                {'M',null,'S' },
+                {null,'A',null },
+                {'M',null,'S' }
+            };
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string relativePath = Path.Combine(basePath, "Input", "Day4.txt");
+            char[,] input = GetInputFromDocument(relativePath);
+            Console.WriteLine("-------------------------");
+            Part1(input);
+            Console.WriteLine("-------------------------");
+            Part2(input, mask);
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("######################################################");
+        }
+        public static void Part1(char[,] input)
+        {
+            Console.WriteLine("Part 1");
+            int count = 0;
+            for (int i = 0; i < input.GetLength(0); i++)
+            {
+                for (int j = 0; j < input.GetLength(1); j++)
+                {
+                    if (input[i, j] == 'X')
+                    {
+                        foreach (int[] direction in directions)
+                        {
+                            if (CheckDirection(input, direction, j, i))
+                            {
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+            Console.WriteLine("The number of XMAS is: " + count);
+        }
+        public static void Part2(char[,] input, char?[,] mask)
+        {
+            Console.WriteLine("Part 2");
+            int count = 0;
             for (int y = 0; y < input.GetLength(0); y++)
             {
                 for (int x = 0; x < input.GetLength(1); x++)
@@ -40,7 +87,7 @@ namespace AdventOfCode2024
 
                 }
             }
-            Console.WriteLine(count);
+            Console.WriteLine("The number of X-MAS is: " + count);
         }
         static char?[,] RotateMask(char?[,] mask)
         {
@@ -94,30 +141,30 @@ namespace AdventOfCode2024
             return true;
 
         }
-        //public static bool CheckDirection(char[][] input, int[] direction, int x, int y)
-        //{
-        //    if (input[y][x] != 'X')
-        //    {
-        //        return false;
-        //    }
+        public static bool CheckDirection(char[,] input, int[] direction, int x, int y)
+        {
+            if (input[y, x] != 'X')
+            {
+                return false;
+            }
 
-        //    List<char> output = new List<char>();
-        //    output.Add(input[y][x]);
-        //    for (int order = 1; order <= 3; order++)
-        //    {
-        //        int yIndex = y + direction[0] * order;
-        //        int xIndex = x + direction[1] * order;
-        //        if (CheckBounds(input.GetLength(0)-1, input[0].Length-1, yIndex, xIndex))
-        //        {
-        //            output.Add(input[yIndex][xIndex]);
-        //        }
-        //    }
-        //    if (new string(output.ToArray()) == "XMAS")
-        //    {
-        //        return true;
-        //    }
-        //    return false;
-        //}
+            List<char> output = new List<char>();
+            output.Add(input[y, x]);
+            for (int order = 1; order <= 3; order++)
+            {
+                int yIndex = y + direction[0] * order;
+                int xIndex = x + direction[1] * order;
+                if (CheckBounds(input.GetLength(0) - 1, input.GetLength(1) - 1, yIndex, xIndex))
+                {
+                    output.Add(input[yIndex, xIndex]);
+                }
+            }
+            if (new string(output.ToArray()) == "XMAS")
+            {
+                return true;
+            }
+            return false;
+        }
         static bool CheckBounds(int sizeX, int sizeY, int x, int y)
         {
             if (x < 0 || x > sizeX)
