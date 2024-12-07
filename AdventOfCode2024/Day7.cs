@@ -42,11 +42,7 @@ namespace AdventOfCode2024
 
         public static void Part1()
         {
-
-        }
-
-        public static void Part2()
-        {
+            Console.WriteLine("Part 1");
             long count = 0;
             for (int i = 0; i < input.Count; i++)
             {
@@ -55,15 +51,20 @@ namespace AdventOfCode2024
                     Console.Write(calibrationValues[i][j] + " ");
                 }
                 Console.WriteLine("Expected Result: " + input[i].Item1);
-               
+
                 if (ValidSolutionExists(input[i].Item2, input[i].Item1))
                 {
-                   
+
                     Console.WriteLine("Valid Solution Exists");
                     count += input[i].Item1;
                 }
             }
             Console.WriteLine("Number of Valid Solutions: " + count);
+        }
+
+        public static void Part2()
+        {
+            
         }
       
         public static bool ValidSolutionExists(Node node, long expectedResult)
