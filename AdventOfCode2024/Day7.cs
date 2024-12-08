@@ -59,15 +59,10 @@ namespace AdventOfCode2024
             long count = 0;
             for (int i = 0; i < input.Count; i++)
             {
-                for (int j = 0; j < input[i].Item2.Count; j++)
-                {
-                    Console.Write(input[i].Item2[j] + " ");
-                }
+
                 Node constructedTree = ConstructTree(input[i].Item2);
-                Console.WriteLine("Expected Result: " + input[i].Item1);
                 if (ValidSolutionExists(constructedTree, input[i].Item1))
                 {
-                    Console.WriteLine("Valid Solution Exists");
                     count += input[i].Item1;
                 }
             }
@@ -83,10 +78,8 @@ namespace AdventOfCode2024
                 // Hier können Sie eine andere Methode zur Baumkonstruktion aufrufen
                 NodeTripple root = ConstructTreeTripple(item.Item2);
 
-                Console.WriteLine("Expected Result: " + item.Item1);
                 if (ValidSolutionExistsTripple(root, item.Item1)){
-                    Console.WriteLine("Valid Solution Exists");
-                    PrintTreeTripple(root);
+                    
                    
                     count += item.Item1;
                 }
