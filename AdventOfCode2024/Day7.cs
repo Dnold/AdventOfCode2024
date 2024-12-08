@@ -86,6 +86,8 @@ namespace AdventOfCode2024
                 Console.WriteLine("Expected Result: " + item.Item1);
                 if (ValidSolutionExistsTripple(root, item.Item1)){
                     Console.WriteLine("Valid Solution Exists");
+                    PrintTreeTripple(root);
+                   
                     count += item.Item1;
                 }
             }
@@ -202,7 +204,35 @@ namespace AdventOfCode2024
             }
             return startNode;
         }
-
+        public static void PrintTreeTripple(NodeTripple node, string indent = "", bool isLeft = true)
+        {
+            if (node != null)
+            {
+                Console.Write(indent + (isLeft ? "├──" : "└──") + node.value);
+                if (!string.IsNullOrEmpty(node.operation))
+                {
+                    if (node.operation.StartsWith("+"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
+                    else if (node.operation.StartsWith("*"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else if (node.operation.StartsWith("||"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                    }
+                    Console.Write(" (" + node.operation + ")");
+                    Console.ResetColor();
+                }
+                Console.WriteLine();
+                indent += isLeft ? "│   " : "    ";
+                PrintTreeTripple(node.left, indent, true);
+                PrintTreeTripple(node.middle, indent, false);
+                PrintTreeTripple(node.right, indent, false);
+            }
+        }
         public static void PrintTree(Node node, string indent = "", bool isLeft = true)
         {
             if (node != null)
