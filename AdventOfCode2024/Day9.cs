@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Text.Json.Serialization.Metadata;
 
 namespace AdventOfCode2024
 {
     public static class Day9
     {
-        public static char[] input = Array.Empty<char>();
+        public static int[] input = Array.Empty<int>();
 
         public static void Run()
         {
@@ -26,76 +25,146 @@ namespace AdventOfCode2024
 
         public static void Part1()
         {
-            bool isEmptySpace = false;
-            List<char> blocks = new List<char>();
+            List<int> blocks = new List<int>();
             int id = 0;
+
+            // Populate blocks and blanks
             for (int i = 0; i < input.Length; i++)
             {
-                int count = Convert.ToInt32(input[i] + "");
+                int count = input[i]; // Number of blocks or blanks
 
-                if (!isEmptySpace)
+                if (i % 2 == 0) // Non-empty blocks
                 {
                     for (int j = 0; j < count; j++)
                     {
-                        blocks.Add((id + "")[0]);
+                        blocks.Add(id); // Add block ID
                     }
                     id++;
                 }
-                else
+                else // Empty spaces
                 {
                     for (int j = 0; j < count; j++)
                     {
-                        blocks.Add('.');
+                        blocks.Add(-1); // Add blank space as -1
                     }
                 }
-                isEmptySpace = !isEmptySpace;
             }
 
             // Debug: Print initial blocks
-            Console.WriteLine("Initial Blocks: " + new string(blocks.ToArray()));
+            Console.WriteLine("Initial Blocks: " + string.Join(", ", blocks));
 
-            // Move all non-empty blocks to the leftmost free space one at a time
-            for (int i = blocks.Count - 1; i >= 0; i--)
+            // Move all non-empty blocks to the leftmost free space
+            for (int i = 0; i < blocks.Count; i++)
             {
-                if (blocks[i] != '.')
+                if (blocks[i] == -1)
                 {
-                    for (int j = 0; j < i; j++)
-                    {
-                        if (blocks[j] == '.')
-                        {
-                            blocks[j] = blocks[i];
-                            blocks[i] = '.';
-                            break;
-                        }
-                    }
+                    while (blocks[^1] == -1) // Remove trailing blanks
+                        blocks.RemoveAt(blocks.Count - 1);
+
+                    if (blocks.Count <= i) break; // Stop if all blanks are handled
+
+                    blocks[i] = blocks[^1]; // Fill blank with the last block
+                    blocks.RemoveAt(blocks.Count - 1); // Remove used block
                 }
             }
 
             // Debug: Print blocks after moving non-empty blocks
-            Console.WriteLine("Blocks After Moving Non-Empty: " + new string(blocks.ToArray()));
+            Console.WriteLine("Blocks After Moving Non-Empty: " + string.Join(", ", blocks));
 
-            // Find CheckSum
+            // Calculate checksum
             long sum = 0;
-            for (int i = 0; i < blocks.Count; ++i)
+            for (int i = 0; i < blocks.Count; i++)
             {
-                if (blocks[i] == '.')
-                {
-                    continue;
-                }
-                sum += Convert.ToInt32(blocks[i] + "") * i;
+                if (blocks[i] == -1) continue; // Skip blanks
+                sum += blocks[i] * i;
             }
             Console.WriteLine("Checksum: " + sum);
         }
 
-
         public static void Part2()
         {
-            Console.WriteLine("Part2");
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string relativePath = Path.Combine(basePath, "Input", "Day9.txt");
+            input = GetInput(relativePath); // Refresh input
+
+            Dictionary<int, (int, int)> files = new Dictionary<int, (int, int)>();
+            List<(int, int)> blanks = new List<(int, int)>();
+
+            int fid = 0;
+            int pos = 0;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                int x = input[i];
+
+                if (i % 2 == 0)
+                {
+                    if (x == 0)
+                    {
+                        throw new Exception("File size cannot be 0");
+                    }
+                    files[fid] = (pos, x);
+                    fid++;
+                }
+                else
+                {
+                    if (x != 0)
+                    {
+                        blanks.Add((pos, x));
+                    }
+                }
+
+                pos += x;
+                // Debug: Print initial blocks
+            }
+            while (fid > 0)
+            {
+                fid -= 1;
+                (int pos, int size) file = files[fid];
+                for (int i = 0; i < blanks.Count; i++)
+                {
+                    (int bpos, int bsize) = blanks[i];
+                    if (bpos >= file.pos)
+                    {
+                        blanks = blanks.GetRange(0, i);
+                        break;
+                    }
+                    if (file.size <= bsize)
+                    {
+                        files[fid] = (bpos, file.size);
+
+                        if (file.size == bsize)
+                        {
+                            blanks.RemoveAt(i);
+
+                        }
+                        else
+                        {
+                            blanks[i] = (bpos + file.size, bsize - file.size);
+                        }
+                        break;
+                    }
+
+                }
+
+            }
+            long total = 0;
+            foreach (var kvp in files)
+            {
+                int mid = kvp.Key;
+                var (rpos, rsize) = kvp.Value; // Dekonstruktion des Tupels
+
+                for (int x = rpos; x < rpos + rsize; x++)
+                {
+                    total += mid * x;
+                }
+            }
+            Console.WriteLine("Checksum: " + total);
         }
 
-        public static char[] GetInput(string path)
+        public static int[] GetInput(string path)
         {
-            List<char> result = new List<char>();
+            List<int> result = new List<int>();
 
             using (StreamReader sr = new StreamReader(path))
             {
@@ -104,7 +173,10 @@ namespace AdventOfCode2024
                 {
                     foreach (char c in line)
                     {
-                        result.Add(c);
+                        if (char.IsDigit(c))
+                        {
+                            result.Add(c - '0'); // Convert char to int
+                        }
                     }
                 }
             }
