@@ -61,6 +61,9 @@ namespace AdventOfCode2024
             {
 
                 Node constructedTree = ConstructTree(input[i].Item2);
+           
+                    PrintTree(constructedTree);
+                
                 if (ValidSolutionExists(constructedTree, input[i].Item1))
                 {
                     count += input[i].Item1;
@@ -73,6 +76,7 @@ namespace AdventOfCode2024
             input = GetInput(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Input", "Day7.txt"));
             long count = 0;
             Console.WriteLine("Part 2");
+          
             foreach (var item in input)
             {
                 // Hier können Sie eine andere Methode zur Baumkonstruktion aufrufen
